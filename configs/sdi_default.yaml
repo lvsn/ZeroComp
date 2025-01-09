@@ -1,0 +1,151 @@
+# General
+cache_dir: null
+seed: 0
+push_to_hub: false
+hub_token: null
+hub_model_id: null
+# Model
+conditioning_maps: [depth, normal, diffuse, shading, mask]
+feed_empty_prompt: true
+scale_destination_composite_to_minus_one_to_one: true
+use_predictors_instead_of_gt: false
+# Load model
+noise_scheduler_name: ddim
+pretrained_model_name_or_path: .cache/huggingface/hub/models--stabilityai--stable-diffusion-2-1/snapshots/5cae40e6a2745ae2b01ad92ae5043f95f23644d6
+# pretrained_model_name_or_path: stabilityai/stable-diffusion-2-1
+controlnet_model_name_or_path: null
+revision: null
+tokenizer_name: null
+vae_type: normal
+# Train
+num_train_epochs: 10000
+max_train_steps: null
+# Checkpointing
+checkpointing_steps: 2000
+checkpoints_total_limit: null
+resume_from_checkpoint: null
+# Optimizer
+learning_rate: 8e-5
+scale_lr: false
+lr_scheduler: constant
+lr_warmup_steps: 500
+lr_num_cycles: 1
+lr_power: 1.0
+use_8bit_adam: false
+dataloader_num_workers: 8
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_weight_decay: 1e-2
+adam_epsilon: 1e-08
+max_grad_norm: 1.0
+# Performance
+gradient_accumulation_steps: 1
+gradient_checkpointing: false
+mixed_precision: null
+allow_tf32: false
+enable_xformers_memory_efficient_attention: true
+set_grads_to_none: true
+dynamo_backend: null
+# dynamo_backend: INDUCTOR
+# Dataset
+dataset_name: openrooms_mainxml1
+dataset_dir: ../datasets/openrooms_mainxml1
+dataset_config_name: null
+image_column: image
+conditioning_image_column: conditioning_image
+caption_column: text
+max_train_samples: null
+proportion_empty_prompts: 0
+resolution: 512
+train_batch_size: 4
+val_batch_size: 4
+# Augmentation
+valid_mask_type: depth_valid_mask_loss
+random_cutout_intrinsics: false
+inverse_cutout_mask: false # Inverse cutout mask for relighting the scene
+aug:
+  max_holes: 3
+  max_height: 0.9
+  max_width: 0.9
+  min_holes: 1
+  min_height: 0.2
+  min_width: 0.2
+  fill_value: -1
+  p: 0.6 # probability of applying the transform, when always_apply is False
+  fully_drop_p: 0.3 # probability of dropping the whole image, when always_apply is False
+  always_apply: false
+  max_circles: 3
+  min_circles: 1
+  max_radius: 0.3
+  min_radius: 0.05
+  p_circle: 0.6
+aug_diffuse:
+  active: false
+  max_holes: 1
+  max_height: 0.5
+  max_width: 0.5
+  p: 0.2 # probability of applying the transform, when always_apply is False
+# Loss scale
+scale_loss_bg: 1.0
+scale_loss_fg: 0.5
+# Logging
+report_to: comet_ml
+output_dir: outputs/${now:%Y-%m-%d_%H-%M-%S}
+logging_dir: logs
+checkpoint_dir: checkpoints
+val_scheduler:
+  name: ddim
+  kwargs:
+    timestep_spacing: 'trailing'
+    rescale_betas_zero_snr: true
+validation_prompt: null
+validation_image: null
+num_validation_images: 4
+validation_steps: 1000
+# Tracker
+tracker_project_name: controlnet
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d_%H-%M-%S}
+  job:
+    chdir: False
+
+eval:
+  device: cuda
+  weight_dtype: fp16
+  num_inference_steps: 20
+  eval_batch_size: 1
+  controlnet_model_name_or_path: outputs_cloud/openrooms_ddim_wo_bg/checkpoints-808000
+  results_dir: results_v2/${now:%Y-%m-%d_%H-%M-%S}
+  # predictor_names: [depthanything, precompute_stablenormal, precompute]
+  # predictor_names: [metric3d, precompute_stablenormal, precompute]
+  # predictor_names: [depthanythingv2_relative, omnidata, precompute]
+  # predictor_names: [depthanythingv2_relative, metric3d, precompute]
+  # predictor_names: [depthanythingv2_relative, precompute_stablenormal, dfnet]
+  # predictor_names: [depthanythingv2_relative, precompute_stablenormal, precompute]
+  predictor_names: [zoedepth, precompute_stablenormal, precompute]
+  # predictor_names: [zoedepth, stablenormal, precompute]
+  use_rgb_as_diffuse: false
+  depth_scale_factor: 1
+  adjust_bgdepth_to_objdepth: false
+  obj_color_balance: true
+  # shading_maskout_mode: None
+  # shading_maskout_mode: BBox
+  # shading_maskout_mode: BBoxWithDepth
+  shading_maskout_mode: PointCloud
+  # shading_maskout_mode: Cone
+  shading_maskout_bbox_dilation: 30
+  shading_maskout_bbox_depth_range: 4.0
+  point_cloud_fov: 50
+  shading_maskout_pc_range: 0.8
+  shading_maskout_pc_type: relative
+  shading_maskout_pc_range_relative: 1.0
+  shading_maskout_cone_radius: 0.6
+  shading_maskout_obj_dilation: 0
+  # shading_maskout_pc_above_cropping_type: abovebbox
+  shading_maskout_pc_above_cropping_type: argmin
+  shading_maskout_cone_angle: 90
+  post_compositing: true
+  output_all: false

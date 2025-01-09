@@ -1,0 +1,34 @@
+torch>=2.1.2
+urllib3
+torchvision
+torchinfo
+numpy
+tqdm
+pillow
+opencv-python
+triton
+openexr
+omegaconf
+hydra-core
+xformers==0.0.23.post1
+transformers
+bitsandbytes
+timm
+comet_ml
+h5py
+json5
+accelerate
+matplotlib
+open3d
+einops
+mmcv==2.1.0
+# pytorch-lightning==1.8.3
+termcolor
+peft
+setuptools==69.5.1
+scikit-image
+gradio
+# huggingface_hub
+# For diffuse prediction of Intrinsic Image Diffusion
+# taming-transformers-rom1504
+# open_clip_torch
