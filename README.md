@@ -4,6 +4,14 @@
 
 <p align="center">WACV 2025</p>
 
+<p>               
+ <center>
+    <span style="font-size:24px"><a href='https://lvsn.github.io/ZeroComp/'>[Website]</a></span>
+    <span style="font-size:24px"><a href='https://arxiv.org/abs/2410.08168'>[Paper]</a></span>
+    <span style="font-size:24px"><a href='https://lvsn.github.io/ZeroComp/supp/index.html'>[Supplementary]</a></span><br>
+</center>
+</p>
+
 ## Environments
 
 1. Clone the repo and submodules
