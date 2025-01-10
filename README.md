@@ -1,6 +1,6 @@
 <h1 align="center"> ZeroComp: Zero-shot Object Compositing from Image Intrinsics via Diffusion </h1>
 
-<p align="center"><a href="https://zzt76.github.io/" target="_blank">Zitian Zhang</a>, <a href="" target="_blank">Frédéric Fortier-Chouinard</a>, <a href="https://mathieugaron.ca/" target="_blank">Mathieu Garon</a>, <a href="https://anandbhattad.github.io/" target="_blank">Anand Bhattad</a>, <a href="https://vision.gel.ulaval.ca/~jflalonde/" target="_blank">Jean-François Lalonde</a>
+<p align="center"><a href="https://zzt76.github.io/" target="_blank">Zitian Zhang</a>, <a href="https://ca.linkedin.com/in/lefreud/en" target="_blank">Frédéric Fortier-Chouinard</a>, <a href="https://mathieugaron.ca/" target="_blank">Mathieu Garon</a>, <a href="https://anandbhattad.github.io/" target="_blank">Anand Bhattad</a>, <a href="https://vision.gel.ulaval.ca/~jflalonde/" target="_blank">Jean-François Lalonde</a>
 
 <p align="center">WACV 2025</p>
 
@@ -17,8 +17,7 @@ Make sure you also clone the submodule ```predictors```.
 pip install -r requirements.txt
 ```
 
-3. Download [Stable Diffussion 2.0](https://huggingface.co/stabilityai/stable-diffusion-2-1) from huggingface, and modify the ```pretrained_model_name_or_path``` variable in ```configs/sg_labo.yaml```.
-
+3. Download [Stable Diffussion 2.1](https://huggingface.co/stabilityai/stable-diffusion-2-1) from huggingface, and modify the ```pretrained_model_name_or_path``` variable in ```configs/sg_labo.yaml```.
 
 
 ## Pretrained weights
@@ -31,11 +30,18 @@ src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" a
 style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"
 src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img
 style="height:22px!important;margin-left:3px;vertical-align:text-bottom;"
-src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" alt=""></a> license. If you agree with the conditions, please fill [this form]() and send an email to jflalonde@gel.ulaval.ca to acquire the pretrained weights. The pretrained weights include the openrooms 7days model, interior verse 2days and 7days models.
+src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" alt=""></a> license.
+
+```Depth, normals, albedo```
+Openrooms 7days: [link](https://hdrdb-public.s3.valeria.science/zerocomp/openrooms_7days.zip)
+
+```Depth, normals, albedo, roughness, metallic```
+Interior Verse 2days: [link](https://hdrdb-public.s3.valeria.science/zerocomp/interior_verse_2days.zip)
+Interior Verse 7days: [link](https://hdrdb-public.s3.valeria.science/zerocomp/interior_verse_7days.zip)
 
 ## Predictors
 
-You can get the intrinsic predictor weights by the following list. After downloading, move them to ```.cache/checkpoints``` folder.
+You can get the intrinsic predictor weights from the original repos, the links are provided in the following. After downloading, move them to ```.cache/checkpoints``` folder.
 
 #### Depth
 ZoeDepth: [ZoeD_M12_NK.pt](https://github.com/isl-org/ZoeDepth)
@@ -77,23 +83,21 @@ python gradio_composite_w_rm.py
 
 ## Acknowledgements
 
-This implementation builds upon Hugging Face’s [Diffusers](https://github.com/huggingface/diffusers) library. We also acknowledge [Gradio](https://www.gradio.app/) for providing an easy-to-use interface that allowed us to create the inference demos for our models.
+This implementation builds upon Hugging Face’s [Diffusers](https://github.com/huggingface/diffusers) library. We also acknowledge [Gradio](https://www.gradio.app/) for providing a developer-friendly tool to create the interative demos for our models.
 
 ## BibTex
 If you find it useful, please consider citing ZeroComp:
 ```
-@misc{zhang2024zerocompzeroshotobjectcompositing,
-      title={ZeroComp: Zero-shot Object Compositing from Image Intrinsics via Diffusion}, 
-      author={Zitian Zhang and Frédéric Fortier-Chouinard and Mathieu Garon and Anand Bhattad and Jean-François Lalonde},
-      year={2024},
-      eprint={2410.08168},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2410.08168}, 
+@article{zhang2024zerocomp,
+  title={Zerocomp: Zero-shot object compositing from image intrinsics via diffusion},
+  author={Zhang, Zitian and Fortier-Chouinard, Fr{\'e}d{\'e}ric and Garon, Mathieu and Bhattad, Anand and Lalonde, Jean-Fran{\c{c}}ois},
+  journal={arXiv preprint arXiv:2410.08168},
+  year={2024}
 }
 ```
 
 ## License
+The codes, pretrained weights and test dataset are all for non-commercial use only.
 
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title"
         rel="cc:attributionURL" href="https://lvsn.github.io/ZeroComp/">ZeroComp: Zero-shot Object Compositing from

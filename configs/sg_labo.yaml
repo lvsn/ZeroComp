@@ -7,7 +7,7 @@ train_batch_size: 1
 dataloader_num_workers: 2
 
 dataset_name: labo
-dataset_dir: ../datasets/labo/GT_emission_envmap
+dataset_dir: ../labo/GT_emission_envmap
 pretrained_model_name_or_path: .cache/huggingface/hub/models--stabilityai--stable-diffusion-2-1/snapshots/5cae40e6a2745ae2b01ad92ae5043f95f23644d6
 
 enable_xformers_memory_efficient_attention: false

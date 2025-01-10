@@ -735,4 +735,4 @@ with block:
                            outputs=[input_comp_depth, input_comp_normal, input_comp_diffuse, input_comp_shading, input_comp_mask])
     generate_btn.click(fn=generate_image, inputs=[seed, color_rebalance, post_compositing], outputs=[output_pred_comp, output_pred_bg, output_post_comp])
 
-block.launch(server_name='127.0.0.1', server_port=786)
+block.launch(server_name='127.0.0.1', server_port=7860)
