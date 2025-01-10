@@ -1,0 +1,3 @@
+[submodule "predictors"]
+	path = predictors
+	url = git@github.com:zzt76/predictors.git
