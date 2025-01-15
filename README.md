@@ -90,6 +90,7 @@ python gradio_composite_w_rm.py
 ```
 
 ## Acknowledgements
+This research was supported by NSERC grants RGPIN 2020-04799 and ALLRP 586543-23, Mitacs and Depix. Computing resources were provided by the Digital Research Alliance of Canada. We also thank Louis-Étienne Messier and Justine Giroux for their help as well as all members of the lab for discussions and proofreading help.
 
 This implementation builds upon Hugging Face’s [Diffusers](https://github.com/huggingface/diffusers) library. We also acknowledge [Gradio](https://www.gradio.app/) for providing a developer-friendly tool to create the interative demos for our models.
 
