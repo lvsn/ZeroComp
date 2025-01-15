@@ -61,7 +61,7 @@ OmniDataV2: [omnidata_dpt_normal_v2.ckpt](https://github.com/EPFL-VILAB/omnidata
 StableNormal: [stable-normal-v0-1](https://github.com/Stable-X/StableNormal)
 
 #### Materials
-For diffuse only, you can use our own not that good model [dfnet]().
+For diffuse only, you can use our own not that good model [dfnet](https://hdrdb-public.s3.valeria.science/zerocomp/dfnet_w_hypersim2.safetensors).
 For diffuse, roughness and metallic, you can precompute these maps by [IntrinsicImageDiffusion](https://github.com/Peter-Kocsis/IntrinsicImageDiffusion), [RGB<->X](https://github.com/zheng95z/rgbx) or other predictors. Name them as in the provided test dataset and load them by changing ```predictor_names``` to ```precompute```.
 
 #### Custom predictors
