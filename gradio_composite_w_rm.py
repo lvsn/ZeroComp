@@ -47,10 +47,12 @@ weight_dtype = torch.float16
 gradio_dir = './gradio_cache'
 gradio_save_dir = './results_gradio'
 
-# Global variables
-g_obj_batch = None
-g_dst_batch = None
-g_comp_batch = None
+# Create a dictionary to hold your state data:
+initial_state = {
+    "obj_batch": None,
+    "dst_batch": None,
+    "comp_batch": None,
+}
 
 
 # Load the tokenizer
@@ -149,7 +151,8 @@ def load_image_from_gradio(image):
 
 
 @torch.inference_mode()
-def predict_bg_intrinsics(background_rgb,
+def predict_bg_intrinsics(state,
+                          background_rgb,
                           background_dp, background_nm,
                           background_df,
                           background_rg, background_mt):
@@ -200,9 +203,8 @@ def predict_bg_intrinsics(background_rgb,
         'metallic': background_mt
     }
 
-    # Save to global variable
-    global g_dst_batch
-    g_dst_batch = temp_bg_batch
+    # Save to state
+    state["dst_batch"] = temp_bg_batch
 
     bg_rgb = sdi_utils.tensor_to_pil(background_rgb)
     bg_depth = sdi_utils.tensor_to_pil(bg_depth_hdr, initial_range=(bg_depth_hdr.min(), bg_depth_hdr.max()))
@@ -212,11 +214,12 @@ def predict_bg_intrinsics(background_rgb,
     bg_roughness = sdi_utils.tensor_to_pil(background_rg)
     bg_metallic = sdi_utils.tensor_to_pil(background_mt)
 
-    return bg_rgb, bg_depth, bg_normal, bg_diffuse, bg_shading, bg_roughness, bg_metallic
+    return state, bg_rgb, bg_depth, bg_normal, bg_diffuse, bg_shading, bg_roughness, bg_metallic
 
 
 @torch.inference_mode()
-def process_obj_intrinsics(obj_file,
+def process_obj_intrinsics(state,
+                           obj_file,
                            obj_img, mask_img,
                            obj_dp, obj_nm,
                            obj_df,
@@ -325,30 +328,31 @@ def process_obj_intrinsics(obj_file,
     mask_vis = sdi_utils.tensor_to_pil(batch['mask'])
     diffuse_edit_vis = sdi_utils.tensor_to_pil(batch['diffuse'])
 
-    # Save to global variable
-    global g_obj_batch
-    g_obj_batch = batch
+    # Save to state
+    state["obj_batch"] = batch
 
-    return obj_vis, depth_vis, normal_vis, diffuse_vis, roughness_vis, metallic_vis, mask_vis, diffuse_edit_vis
+    return state, obj_vis, depth_vis, normal_vis, diffuse_vis, roughness_vis, metallic_vis, mask_vis, diffuse_edit_vis
 
 
 @torch.inference_mode()
-def process_edit_intrinsics(obj_diffuse_edited):
+def process_edit_intrinsics(state, obj_diffuse_edited):
     obj_diffuse_edited = load_image_from_gradio(obj_diffuse_edited['composite'][:, :, 0:3])
     obj_diffuse_edited = obj_diffuse_edited.to(device)
 
     # Modify the object batch
-    global g_obj_batch
-    g_obj_batch['diffuse'] = obj_diffuse_edited
+    state["obj_batch"]['diffuse'] = obj_diffuse_edited
+
+    return state
 
 
 @torch.inference_mode()
-def process_comp(obj_relative_scale, obj_relative_vertical_position, obj_relative_horizontal_position,
+def process_comp(state,
+                 obj_relative_scale, obj_relative_vertical_position, obj_relative_horizontal_position,
                  obj_depth_min_value, obj_depth_scale,
                  shading_maskout_mode, shading_maskout_dilation, shading_maskout_range,
                  occlusion,
                  obj_diffuse_offset, obj_roughness_offset, obj_metallic_offset,):
-    global g_obj_batch
+    g_obj_batch = state["obj_batch"]
     obj_depth = g_obj_batch['depth']
     obj_normal = g_obj_batch['normal']
     obj_diffuse = g_obj_batch['diffuse']
@@ -386,7 +390,7 @@ def process_comp(obj_relative_scale, obj_relative_vertical_position, obj_relativ
     obj_batch['depth'] = obj_depth
     obj_mask = obj_batch['mask']
 
-    global g_dst_batch
+    g_dst_batch = state["dst_batch"]
     # Get bg shading
     dst_bg = g_dst_batch['pixel_values'] * 0.5 + 0.5
     dst_depth = g_dst_batch['depth'].clone()
@@ -535,24 +539,21 @@ def process_comp(obj_relative_scale, obj_relative_vertical_position, obj_relativ
         'obj_batch': obj_batch,
     }
 
-    # Save to global variable
-    global g_comp_batch
-    g_comp_batch = comp_batch
+    # Save to state
+    state["comp_batch"] = comp_batch
 
-    return visualization['depth'], visualization['normal'], visualization['diffuse'], visualization['shading'], visualization['mask'], visualization['roughness'], visualization['metallic']
+    return state, visualization['depth'], visualization['normal'], visualization['diffuse'], visualization['shading'], visualization['mask'], visualization['roughness'], visualization['metallic']
 
 
 @torch.inference_mode()
-def generate_image(seed, color_rebalance, post_compositing):
-    global g_comp_batch
-    comp_batch = g_comp_batch
+def generate_image(state, seed, color_rebalance, post_compositing):
+    comp_batch = state["comp_batch"]
 
     conditioning = comp_batch['conditioning']
     obj_mask = comp_batch['obj_mask']
     validation_prompt = comp_batch['validation_prompt']
 
-    global g_dst_batch
-    dst_batch = g_dst_batch
+    dst_batch = state["dst_batch"]
     dst_bg = dst_batch['pixel_values']
     dst_depth = dst_batch['depth']
     dst_normal = dst_batch['normal']
@@ -658,13 +659,15 @@ def generate_image(seed, color_rebalance, post_compositing):
             v = sdi_utils.tensor_to_pil(v)
         v.save(os.path.join(gradio_save_folder, f"comp_{k}.jpg"), quality=90)
 
-    return vis_batch['pred_comp'], vis_batch['pred_bg'], vis_batch['post_comp']
+    return state, vis_batch['pred_comp'], vis_batch['pred_bg'], vis_batch['post_comp']
 
 
 block = gr.Blocks().queue()
 with block:
     with gr.Row():
         gr.Markdown("## Image Compositing")
+
+    global_state = gr.State(value=initial_state)
 
     with gr.Row():
         with gr.Column():
@@ -789,36 +792,41 @@ with block:
     #     result_gallery = gr.Gallery(label='Composite RGB', show_label=False, elem_id="gallery")
 
     pred_bg_btn.click(fn=predict_bg_intrinsics,
-                      inputs=[background_rgb,
+                      inputs=[global_state,
+                              background_rgb,
                               background_dp, background_nm,
                               background_df,
                               background_rg, background_mt],
-                      outputs=[input_rgb_bg, input_depth_bg, input_normal_bg, input_diffuse_bg, input_shading_bg, input_roughness_bg, input_metallic_bg])
+                      outputs=[global_state, input_rgb_bg, input_depth_bg, input_normal_bg, input_diffuse_bg, input_shading_bg, input_roughness_bg, input_metallic_bg])
     process_obj_btn.click(fn=process_obj_intrinsics,
-                          inputs=[obj_file,
+                          inputs=[global_state,
+                                  obj_file,
                                   obj_img, mask_img,
                                   obj_dp, obj_nm,
                                   obj_df,
                                   obj_rg, obj_mt,
                                   object_intrinsic_mode, use_rgb_as_diffuse],
-                          outputs=[input_rgb_obj,
+                          outputs=[global_state,
+                                   input_rgb_obj,
                                    input_depth_obj, input_normal_obj,
                                    input_diffuse_obj,
                                    input_roughness_obj, input_metallic_obj,
                                    input_mask_obj,
                                    input_diffuse_obj_edit])
-    process_edit_btn.click(fn=process_edit_intrinsics, inputs=[input_diffuse_obj_edit])
+    process_edit_btn.click(fn=process_edit_intrinsics, inputs=[global_state, input_diffuse_obj_edit], outputs=[global_state])
     process_comp_btn.click(fn=process_comp,
-                           inputs=[obj_relative_scale, obj_relative_vertical_position, obj_relative_horizontal_position,
+                           inputs=[global_state,
+                                   obj_relative_scale, obj_relative_vertical_position, obj_relative_horizontal_position,
                                    obj_depth_min_value, obj_depth_scale,
                                    shading_maskout_mode, shading_maskout_dilation, shading_maskout_range,
                                    occlusion,
                                    obj_diffuse_offset, obj_roughness_offset, obj_metallic_offset,
                                    ],
-                           outputs=[input_comp_depth, input_comp_normal,
+                           outputs=[global_state,
+                                    input_comp_depth, input_comp_normal,
                                     input_comp_diffuse,
                                     input_comp_shading, input_comp_mask,
                                     input_comp_roughness, input_comp_metallic,])
-    generate_btn.click(fn=generate_image, inputs=[seed, color_rebalance, post_compositing], outputs=[output_pred_comp, output_pred_bg, output_post_comp])
+    generate_btn.click(fn=generate_image, inputs=[global_state, seed, color_rebalance, post_compositing], outputs=[global_state, output_pred_comp, output_pred_bg, output_post_comp])
 
 block.launch(server_name='127.0.0.1')
