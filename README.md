@@ -2,7 +2,7 @@
 
 <p align="center"><a href="https://zzt76.github.io/" target="_blank">Zitian Zhang</a>, <a href="https://ca.linkedin.com/in/lefreud/en" target="_blank">Frédéric Fortier-Chouinard</a>, <a href="https://mathieugaron.ca/" target="_blank">Mathieu Garon</a>, <a href="https://anandbhattad.github.io/" target="_blank">Anand Bhattad</a>, <a href="https://vision.gel.ulaval.ca/~jflalonde/" target="_blank">Jean-François Lalonde</a>
 
-<p align="center">WACV 2025</p>
+<h3 align="center">WACV 2025 (Oral)</h3>
 
 <p>               
  <center>
@@ -97,11 +97,25 @@ This implementation builds upon Hugging Face’s [Diffusers](https://github.com/
 ## BibTex
 If you find it useful, please consider citing ZeroComp:
 ```
-@article{zhang2024zerocomp,
-  title={Zerocomp: Zero-shot object compositing from image intrinsics via diffusion},
-  author={Zhang, Zitian and Fortier-Chouinard, Fr{\'e}d{\'e}ric and Garon, Mathieu and Bhattad, Anand and Lalonde, Jean-Fran{\c{c}}ois},
-  journal={arXiv preprint arXiv:2410.08168},
-  year={2024}
+@InProceedings{zhang2025zerocomp,
+    author    = {Zhang, Zitian and Fortier-Chouinard, Fr\'ed\'eric and Garon, Mathieu and Bhattad, Anand and Lalonde, Jean-Fran\c{c}ois},
+    title     = {ZeroComp: Zero-Shot Object Compositing from Image Intrinsics via Diffusion},
+    booktitle = {Proceedings of the Winter Conference on Applications of Computer Vision (WACV)},
+    month     = {February},
+    year      = {2025},
+    pages     = {483-494}
+}
+```
+Our follow-up work [SpotLight](https://lvsn.github.io/spotlight/) focuses on training-free local relighting, please feel free to check it out if you're interested :)
+```
+@misc{fortierchouinard2025spotlightshadowguidedobjectrelighting,
+      title={SpotLight: Shadow-Guided Object Relighting via Diffusion}, 
+      author={Frédéric Fortier-Chouinard and Zitian Zhang and Louis-Etienne Messier and Mathieu Garon and Anand Bhattad and Jean-François Lalonde},
+      year={2025},
+      eprint={2411.18665},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2411.18665}, 
 }
 ```
 
