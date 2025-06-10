@@ -20,8 +20,8 @@ def compose_bg_obj_batch(dst_batch, obj_batch,
                          point_cloud_fov=50, shading_maskout_pc_type='absolute', shading_maskout_pc_range=0.8, shading_maskout_pc_range_relative=1.0,
                          shading_maskout_pc_above_cropping_type='abovebbox', shading_maskout_obj_dilation=0):
 
-    bs = obj_batch['depth'].shape[0]
-    device = obj_batch['depth'].device
+    bs = obj_batch['mask'].shape[0]
+    device = obj_batch['mask'].device
     image_logs = [{} for _ in range(bs)]
 
     obj_depth = obj_batch['depth']

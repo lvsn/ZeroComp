@@ -2,7 +2,7 @@
 
 <p align="center"><a href="https://zzt76.github.io/" target="_blank">Zitian Zhang</a>, <a href="https://ca.linkedin.com/in/lefreud/en" target="_blank">Frédéric Fortier-Chouinard</a>, <a href="https://mathieugaron.ca/" target="_blank">Mathieu Garon</a>, <a href="https://anandbhattad.github.io/" target="_blank">Anand Bhattad</a>, <a href="https://vision.gel.ulaval.ca/~jflalonde/" target="_blank">Jean-François Lalonde</a>
 
-<p align="center">WACV 2025</p>
+<p align="center">WACV 2025 (Oral)</p>
 
 <p>               
  <center>
@@ -43,12 +43,28 @@ src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" a
 ```Depth, normals, albedo```
 Openrooms 7days: [link](https://hdrdb-public.s3.valeria.science/zerocomp/openrooms_7days.zip)
 
+```Normals, albedo```
+Openrooms 2days: [link](https://hdrdb-public.s3.valeria.science/zerocomp/openrooms_2days_wo_depth.zip)
+
 ```Depth, normals, albedo, roughness, metallic```
 Interior Verse 2days: [link](https://hdrdb-public.s3.valeria.science/zerocomp/interior_verse_2days.zip)
 Interior Verse 7days: [link](https://hdrdb-public.s3.valeria.science/zerocomp/interior_verse_7days.zip)
 
-## Predictors
+## A notice for user cases when the footprint depth of the object is not avaiable
+In our paper, the footprint depth of the object is needed to align the object depth with the background depth (or the other way around if the depth is relative disparity). However, we notice that the footprint depth is not always available. So here we provide two different solution:
+1. In the newest version, when the footprint depth is not available, we use the smallest bg depth value inside the object mask as the minimum object depth. Please refer to Line 274-292.
+2. Another solution is you can use the pretrained model without the depth channel. You can download this model with the link provided above, and change the following arguments in the config file (as in configs/sg_labo_wo_depth.yaml):
+```
+conditioning_maps: [normal, diffuse, shading, mask]
 
+eval:
+    controlnet_model_name_or_path: checkpoints/openrooms_2days_wo_depth
+    shading_maskout_mode: BBox
+    shading_maskout_bbox_dilation: 50 # This is a hyperparameter deciding how large we should mask around the object
+``` 
+
+
+## Predictors
 You can get the intrinsic predictor weights from the original repos, the links are provided in the following. After downloading, move them to ```.cache/checkpoints``` folder.
 
 #### Depth

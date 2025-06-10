@@ -14,7 +14,8 @@ enable_xformers_memory_efficient_attention: false
 vae_type: normal
 vae_name_or_path: .cache/huggingface/hub/models--cross-attention--asymmetric-autoencoder-kl-x-1-5/snapshots/8a721838bf5546eb21c954b66f37f531632b5737
 
-conditioning_maps: [depth, normal, diffuse, shading, mask]
+# conditioning_maps: [depth, normal, diffuse, shading, mask]
+conditioning_maps: [normal, diffuse, shading, mask]
 seed: 469
 
 eval:
@@ -22,7 +23,8 @@ eval:
   weight_dtype: fp16
   num_inference_steps: 20
   eval_batch_size: 1
-  controlnet_model_name_or_path: checkpoints/openrooms_7days
+  # controlnet_model_name_or_path: checkpoints/openrooms_7days
+  controlnet_model_name_or_path: checkpoints/openrooms_2days_wo_depth
   # controlnet_model_name_or_path: checkpoints/interior_verse_2days
   # controlnet_model_name_or_path: checkpoints/interior_verse_7days
   results_dir: results_v2/${now:%Y-%m-%d_%H-%M-%S}
@@ -32,6 +34,7 @@ eval:
   # predictor_names: [depthanythingv2_relative, metric3d, precompute]
   # predictor_names: [depthanythingv2_relative, precompute_stablenormal, dfnet]
   # predictor_names: [depthanythingv2_relative, precompute_stablenormal, precompute]
+  # predictor_names: [zoedepth, stablenormal, precompute]
   predictor_names: [zoedepth, precompute_stablenormal, precompute]
   # predictor_names: [zoedepth, stablenormal, precompute]
   # predictor_names: [zoedepth, omnidata, precompute]
@@ -40,10 +43,10 @@ eval:
   adjust_bgdepth_to_objdepth: false
   obj_color_balance: true
   # shading_maskout_mode: None
-  # shading_maskout_mode: BBox
+  shading_maskout_mode: BBox
   # shading_maskout_mode: BBoxWithDepth
-  shading_maskout_mode: PointCloud
-  shading_maskout_bbox_dilation: 30
+  # shading_maskout_mode: PointCloud
+  shading_maskout_bbox_dilation: 50
   shading_maskout_bbox_depth_range: 4.0
   point_cloud_fov: 50
   shading_maskout_pc_range: 0.8

@@ -202,7 +202,7 @@ def main(args):
             obj_mask = batch["mask"]
             # Get object intrinsics directly from dataset
             obj_batch = {
-                "depth": batch["depth"],
+                "depth": batch["depth"] if "depth" in batch else None,
                 "footprint_depth": batch["footprint_depth"] if "footprint_depth" in batch else None,
                 "normal": batch["normal"],
                 "diffuse": batch["diffuse"],
@@ -261,16 +261,37 @@ def main(args):
                                                "dst_bg": bg_list[sample_idx],
                                                "dst_comp": dst_comp_list[sample_idx],
                                                "name": batch["name"][sample_idx]} if "name" in batch else False)
-            if obj_batch['footprint_depth'] is not None:
-                if args.eval.adjust_bgdepth_to_objdepth:
-                    dst_depth = match_depth_from_footprint(dst_depth, obj_batch['depth'], obj_batch['footprint_depth'], args.eval.adjust_bgdepth_to_objdepth)
-                    dst_batch["controlnet_inputs"]["depth"] = dst_depth.clone()
-                    dst_depth = match_depth_from_footprint(dst_depth, obj_depth,
-                                                           obj_batch['footprint_depth'], args.eval.adjust_bgdepth_to_objdepth)
+
+            if 'depth' in args.conditioning_maps:
+                if obj_batch['footprint_depth'] is not None:
+                    if args.eval.adjust_bgdepth_to_objdepth:
+                        dst_depth = match_depth_from_footprint(dst_depth, obj_batch['depth'], obj_batch['footprint_depth'], args.eval.adjust_bgdepth_to_objdepth)
+                        dst_batch["controlnet_inputs"]["depth"] = dst_depth.clone()
+                        dst_depth = match_depth_from_footprint(dst_depth, obj_depth,
+                                                               obj_batch['footprint_depth'], args.eval.adjust_bgdepth_to_objdepth)
+                    else:
+                        obj_batch['depth'] = match_depth_from_footprint(dst_depth, obj_batch['depth'], obj_batch['footprint_depth'], args.eval.adjust_bgdepth_to_objdepth)
+                        obj_depth = match_depth_from_footprint(dst_depth, obj_depth,
+                                                               obj_batch['footprint_depth'], args.eval.adjust_bgdepth_to_objdepth)
                 else:
-                    obj_batch['depth'] = match_depth_from_footprint(dst_depth, obj_batch['depth'], obj_batch['footprint_depth'], args.eval.adjust_bgdepth_to_objdepth)
-                    obj_depth = match_depth_from_footprint(dst_depth, obj_depth,
-                                                           obj_batch['footprint_depth'], args.eval.adjust_bgdepth_to_objdepth)
+                    logger.warning(
+                        f"Footprint depth is not provided for {batch['name']}, using the smallest bg depth value inside the object mask as the minimum object depth."
+                    )
+                    # When no footprint depth is provided, we find the nearest valid bg depth value and let it be the minimum object depth
+                    tmp_mask = obj_batch['mask']
+                    obj_depth = obj_batch["depth"].clone()
+                    obj_area = obj_depth[tmp_mask > 0.9]
+                    min_obj_depth = obj_area.min()
+                    # max_obj_depth = obj_area.max()
+
+                    bg_depth = dst_batch["controlnet_inputs"]["depth"].clone()
+                    bg_area = bg_depth[tmp_mask > 0.9]
+                    min_bg_depth = bg_area.min()
+                    # max_bg_depth = bg_area.max()
+                    # avg_bg_depth = bg_area.mean()
+
+                    obj_depth = (obj_depth - min_obj_depth) + min_bg_depth
+                    obj_batch['depth'] = obj_depth
 
             # Compose the background and object
             comp_batch, conditioning, comp_image_logs = compose_bg_obj_batch(dst_batch, obj_batch,
