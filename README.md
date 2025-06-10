@@ -50,11 +50,11 @@ Openrooms 2days: [link](https://hdrdb-public.s3.valeria.science/zerocomp/openroo
 Interior Verse 2days: [link](https://hdrdb-public.s3.valeria.science/zerocomp/interior_verse_2days.zip)
 Interior Verse 7days: [link](https://hdrdb-public.s3.valeria.science/zerocomp/interior_verse_7days.zip)
 
-## A notice for user cases when the footprint depth of the object is not avaiable
+## Tips for the user cases when the footprint depth of the object is not available
 In our paper, the footprint depth of the object is needed to align the object depth with the background depth (or the other way around if the depth is relative disparity). However, we notice that the footprint depth is not always available. So here we provide two different solution:
 1. In the newest version, when the footprint depth is not available, we use the smallest bg depth value inside the object mask as the minimum object depth. Please refer to Line 274-292.
 2. Another solution is you can use the pretrained model without the depth channel. You can download this model with the link provided above, and change the following arguments in the config file (as in configs/sg_labo_wo_depth.yaml):
-```
+```yaml
 conditioning_maps: [normal, diffuse, shading, mask]
 
 eval:
