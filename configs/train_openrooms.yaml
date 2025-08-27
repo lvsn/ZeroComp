@@ -1,0 +1,21 @@
+defaults:
+  - sdi_default
+  - _self_
+
+train_batch_size: 8 # Train batch size per GPU, in total 4 A100 -> 32
+resolution: 512
+dataloader_num_workers: 8
+output_dir: outputs/openrooms_ddim_${now:%Y-%m-%d_%H-%M-%S}
+conditioning_maps: [depth, normal, diffuse, shading, mask]
+
+# When resume from checkpoint
+resume_from_checkpoint: latest
+learning_rate: 8e-5
+
+enable_xformers_memory_efficient_attention: true
+allow_tf32: true
+set_grads_to_none: true
+
+num_train_epochs: 10000
+dataset_name: openrooms_mainxml1
+dataset_dir: ../datasets/openrooms_mainxml1

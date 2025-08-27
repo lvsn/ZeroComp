@@ -105,6 +105,47 @@ ZeroComp trained on InteriorVerse, with roughness and metallic:
 python gradio_composite_w_rm.py
 ```
 
+## Training
+### Openrooms dataset
+The Openrooms dataset should be structured as follows:
+```
+openrooms_mainxml1/
+├── Geometry/
+│   └── main_xml1/
+│       └── scene0001_00/
+│           ├── imdepth_1.dat
+│           ├── imnormal_1.png
+├── Image/
+│   └── main_xml1/
+│       └── scene0001_00/
+│           ├── im_1.hdr
+│           ├── im_1.png
+├── Mask/
+│   └── main_xml1/
+│       └── scene0001_00/
+│           ├── immask_1.png
+├── Material/
+│   └── main_xml1/
+│       └── scene0001_00/
+│           ├── imbaseColor_1.png
+│           ├── imroughness_1.png
+│           ├── immetallic_1.png
+└── Shading/
+    └── main_xml1/
+        └── scene0001_00/
+            ├── imshading_1.png
+            ├── imshadow_1.png
+```
+### Training command
+On a single GPU, you can run:
+```bash
+python train_controlnet.py --config-name train_openrooms
+```
+For multi-GPU training, you can use:
+```bash
+accelerate launch train_controlnet.py --config-name train_openrooms
+```
+
 ## Acknowledgements
 This research was supported by NSERC grants RGPIN 2020-04799 and ALLRP 586543-23, Mitacs and Depix. Computing resources were provided by the Digital Research Alliance of Canada. We also thank Louis-Étienne Messier and Justine Giroux for their help as well as all members of the lab for discussions and proofreading help.
 
